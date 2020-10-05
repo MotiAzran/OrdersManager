@@ -1,0 +1,27 @@
+Wings,Chicken wings in sauce
+Appetizer
+28
+Fries,Potato fries with home seasoning
+Appetizer
+15
+Mushroom Rissoto,Mushroom rissoto
+Main
+45.5
+Pasta,Pasta with tomato sauce
+Main
+40
+Icecream,Icecream at many flavours
+Desert
+25.5
+Tiramissu,Coffe tiramissu
+Desert
+35
+Cola,
+Drink
+5
+Coffe,
+Drink
+5
+Ice tea,
+Drink
+8
