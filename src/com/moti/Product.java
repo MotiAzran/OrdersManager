@@ -2,7 +2,8 @@ package com.moti;
 
 import java.util.Scanner;
 
-public class Product implements Cloneable {
+
+public class Product {
 
     private String _name;
     private String _description;
@@ -17,27 +18,36 @@ public class Product implements Cloneable {
     }
 
     public Product(String name, String description, MealType meal_type, float price) {
+
         _name = name;
         _description = description;
         _meal_type = meal_type;
         _price = price;
     }
 
+    public Product(Product p) {
+
+        _name = p._name;
+        _description = p._description;
+        _meal_type = p._meal_type;
+        _price = p._price;
+    }
+
     public static Product parse_product_from_file(Scanner product_file) throws IllegalArgumentException{
 
-        // Get product description
+        // Parse first product line - get name and description
         String desc_line = product_file.nextLine();
         String name = _get_name_by_line(desc_line);
         String description = _get_description_by_line(desc_line);
 
-        // Get product meal type
+        // Parse second product line - get meal type
         String meal_type_line = product_file.nextLine();
         MealType meal_type = _get_meal_type_by_line(meal_type_line);
         if (null == meal_type) {
             throw new IllegalArgumentException("Invalid meal type " + meal_type_line);
         }
 
-        // Get product price
+        // Parse third product line - get product price
         float price = product_file.nextFloat();
 
         // Move file pointer to next line
@@ -49,6 +59,8 @@ public class Product implements Cloneable {
     }
 
     private static MealType _get_meal_type_by_line(String line) {
+
+        // Check if the type is a meal type
         for (Product.MealType type : Product.MealType.values()) {
             if (line.equalsIgnoreCase(type.name())) {
                 return type;
@@ -72,18 +84,6 @@ public class Product implements Cloneable {
         }
         // line format: <name>,<description>
         return line.substring(line.indexOf(',') + 1);
-    }
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        Product new_product = (Product) super.clone();
-
-        new_product._name = _name;
-        new_product._description = _description;
-        new_product._meal_type = _meal_type;
-        new_product._price = _price;
-
-        return new_product;
     }
 
     public String get_name() {

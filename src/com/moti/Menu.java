@@ -12,13 +12,14 @@ public class Menu {
         _products = new ArrayList<Product>();
     }
 
-    Menu(ArrayList<Product> products) throws CloneNotSupportedException {
+    Menu(ArrayList<Product> products) {
+
         for (Product product : products) {
-            _products.add((Product) product.clone());
+            _products.add(new Product(product));
         }
     }
 
-    public static Menu parse_menu_from_file(Scanner menu_file) throws CloneNotSupportedException {
+    public static Menu parse_menu_from_file(Scanner menu_file) {
 
         Menu menu = new Menu();
 
@@ -29,15 +30,11 @@ public class Menu {
         return menu;
     }
 
-    void add_product(Product product) throws CloneNotSupportedException {
-        _products.add((Product) product.clone());
+    void add_product(Product product) {
+        _products.add(new Product(product));
     }
 
     public ArrayList<Product> get_products() {
         return _products;
-    }
-
-    public ListIterator<Product> get_products_iterator() {
-        return _products.listIterator();
     }
 }

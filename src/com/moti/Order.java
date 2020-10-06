@@ -12,27 +12,31 @@ public class Order {
         _products = new ArrayList<Product>();
     }
 
-    Order(ArrayList<Product> products) throws CloneNotSupportedException {
+    Order(ArrayList<Product> products)  {
         for (Product product : products) {
-            _products.add((Product) product.clone());
+            _products.add(new Product(product));
             _total_price += product.get_price();
         }
     }
 
-    void add_product(Product product) throws CloneNotSupportedException {
-        _products.add((Product) product.clone());
+    void add_product(Product product)  {
+        _products.add(new Product(product));
         _total_price += product.get_price();
     }
 
-    public ArrayList<Product> get_products() {
-        return _products;
+    public boolean is_empty() {
+        return _products.isEmpty();
     }
 
-    public ListIterator<Product> get_products_iterator() {
-        return _products.listIterator();
-    }
+    public String get_order_summary() {
+        String summary = "";
 
-    public float get_total_price() {
-        return _total_price;
+        for (Product p : _products) {
+            summary = summary.concat(String.format("%s %.2f\n", p.get_name(), p.get_price()));
+        }
+
+        summary = summary.concat(String.format("\nTotal price: %.2f", _total_price));
+
+        return summary;
     }
 }
