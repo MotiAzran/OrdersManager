@@ -1,11 +1,21 @@
+/*
+ * Moti Azran
+ */
 package com.moti;
 
 import javax.swing.*;
 
+/**
+ * Program main class
+ */
 public class Main {
 
+    /**
+     * Function entry point,
+     * shown the program window
+     * @param args command line argument
+     */
     public static void main(String[] args) {
-
         try {
             // Initialize main window
             OrdersManager order_manager = new OrdersManager("menu.txt");

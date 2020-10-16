@@ -1,123 +1,151 @@
+/*
+ * Moti Azran
+ */
 package com.moti;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * Represent the program main window
+ */
 public class OrdersManager extends JFrame {
 
     private final int BUTTONS_PANEL_WIDTH = 500;
     private final int BUTTONS_PANEL_HEIGHT = 50;
     private Menu _menu;
-    private JPanel _menu_panel;
-    private JScrollPane _products_scroll_pane;
-    private ArrayList<ProductPanel> _product_panels;
-    private JPanel _buttons_panel;
-    private JButton _order_button;
+    private JPanel _menuPanel;
+    private JScrollPane _productsScrollPane;
+    private ArrayList<ProductPanel> _productPanels;
+    private JPanel _buttonsPanel;
+    private JButton _orderButton;
 
+    /**
+     * Holds all options after pressing order
+     */
     private enum DialogOption {
         Confirm,
         Change,
         Cancel
     }
 
-    public OrdersManager(String menu_file_path) throws FileNotFoundException {
+    /**
+     * Initialize the window
+     * @param menuFilePath path to menu file
+     * @throws FileNotFoundException if the menu file doesn't exists the exception thrown
+     */
+    public OrdersManager(String menuFilePath) throws FileNotFoundException {
         super("Orders manager");
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-        _init_buttons_panel();
+        _initButtonsPanel();
 
-        _menu = Menu.parse_menu_from_file(new Scanner(new File(menu_file_path)));
+        _menu = Menu.parseMenuFromFile(new Scanner(new File(menuFilePath)));
 
-        _init_products_panel();
+        _initProductsPanel();
 
-        int frame_width = Math.max(BUTTONS_PANEL_WIDTH, ProductPanel.PANEL_WIDTH);
-        int frame_height = Math.min(BUTTONS_PANEL_HEIGHT + ProductPanel.PANEL_HEIGHT * _product_panels.size(), 600);
+        int frameWidth = Math.max(BUTTONS_PANEL_WIDTH, ProductPanel.PANEL_WIDTH);
+        int frameHeight = Math.min(BUTTONS_PANEL_HEIGHT + ProductPanel.PANEL_HEIGHT * _productPanels.size(), 600);
 
-        setSize(frame_width, frame_height);
+        setSize(frameWidth, frameHeight);
     }
 
-    private void _init_buttons_panel() {
+    /**
+     * Init the buttons of the program
+     */
+    private void _initButtonsPanel() {
 
         // Create panel for all buttons
-        _buttons_panel = new JPanel();
-        _buttons_panel.setPreferredSize(new Dimension(BUTTONS_PANEL_WIDTH, BUTTONS_PANEL_HEIGHT));
+        _buttonsPanel = new JPanel();
+        _buttonsPanel.setPreferredSize(new Dimension(BUTTONS_PANEL_WIDTH, BUTTONS_PANEL_HEIGHT));
 
         // Create order button
-        _order_button = new JButton("Order");
-        _order_button.addActionListener(new OrderButtonListener());
+        _orderButton = new JButton("Order");
+        _orderButton.addActionListener(new OrderButtonListener());
 
-        _buttons_panel.add(_order_button);
+        _buttonsPanel.add(_orderButton);
 
     }
 
-    private void _init_products_panel()  {
-
+    /**
+     * Initialize the check box and the combo box
+     */
+    private void _initProductsPanel()  {
         // Create panel for all product panels
-        _menu_panel = new JPanel();
-        _menu_panel.setLayout(new BoxLayout(_menu_panel, BoxLayout.Y_AXIS));
+        _menuPanel = new JPanel();
+        _menuPanel.setLayout(new BoxLayout(_menuPanel, BoxLayout.Y_AXIS));
 
-        ArrayList<Product> products = _menu.get_products();
-        _product_panels = new ArrayList<>();
-        for (Product.MealType meal_type : Product.MealType.values()) {
+        ArrayList<Product> products = _menu.getProducts();
+        _productPanels = new ArrayList<>();
+        for (Product.MealType mealType : Product.MealType.values()) {
             // Get all products of the current meal type
-            List<Product> current_products = products.stream().filter(
-                    p -> p.get_meal_type().equalsIgnoreCase(meal_type.name())).collect(Collectors.toList());
+            List<Product> currentProducts = products.stream().filter(
+                    p -> p.getMealType().equalsIgnoreCase(mealType.name())).collect(Collectors.toList());
 
             // Add meal type label
-            JPanel meal_type_panel = new JPanel();
-            JLabel meal_type_label = new JLabel(meal_type.name());
-            meal_type_panel.add(meal_type_label);
+            JPanel mealTypePanel = new JPanel();
+            JLabel mealTypeLabel = new JLabel(mealType.name());
+            mealTypePanel.add(mealTypeLabel);
 
-            _menu_panel.add(meal_type_panel);
+            _menuPanel.add(mealTypePanel);
 
             // Add all product of the current meal type
-            for (Product p : current_products) {
+            for (Product p : currentProducts) {
                 ProductPanel panel = new ProductPanel(p);
-                _product_panels.add(panel);
+                _productPanels.add(panel);
 
-                _menu_panel.add(panel);
+                _menuPanel.add(panel);
             }
         }
 
-        _products_scroll_pane = new JScrollPane(_menu_panel);
+        _productsScrollPane = new JScrollPane(_menuPanel);
 
-        getContentPane().add(_products_scroll_pane);
-        add(_buttons_panel);
+        getContentPane().add(_productsScrollPane);
+        add(_buttonsPanel);
     }
 
-    private void reset_panels() {
-
+    /**
+     * Reset all products panels
+     */
+    private void resetPanels() {
         // Reset all product panels
-        for (ProductPanel panel : _product_panels) {
-            panel.reset_panel();
+        for (ProductPanel panel : _productPanels) {
+            panel.resetPanel();
         }
     }
 
+    /**
+     * Represent listener for the order button
+     */
     private class OrderButtonListener implements ActionListener {
 
+        /**
+         * Initialize order and show order summary
+         * @param e action information
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
 
             // Init order by user selection
-            Order order = _init_order();
+            Order order = _initOrder();
             if (null == order) {
                 return;
             }
 
-            DialogOption chosen_option = _show_summary_dialog(order);
-            switch (chosen_option) {
+            DialogOption chosenOption = _showSummaryDialog(order);
+            switch (chosenOption) {
                 case Confirm:
                     try {
-                        _handle_confirm(order);
+                        _handleConfirm(order);
                     } catch (IOException exp) {
                         JOptionPane.showMessageDialog(null, "IO Error",
                                 "Error", JOptionPane.ERROR_MESSAGE);
@@ -126,7 +154,7 @@ public class OrdersManager extends JFrame {
                 case Change:
                     break;
                 case Cancel:
-                    _handle_cancel();
+                    _handleCancel();
                     break;
                 default:
                     JOptionPane.showMessageDialog(null, "Invalid option",
@@ -134,31 +162,34 @@ public class OrdersManager extends JFrame {
             }
         }
 
-        private Order _init_order() {
-
+        /**
+         * Initialize user order
+         * @return user chosen order
+         */
+        private Order _initOrder() {
             Order order = new Order();
 
             // Add all chosen products to order
-            for (ProductPanel panel : _product_panels) {
+            for (ProductPanel panel : _productPanels) {
                 if (!panel.is_chosen()) {
                     continue;
                 }
 
-                int product_amount = panel.get_amount();
-                if (-1 == product_amount) {
+                int productAmount = panel.getAmount();
+                if (-1 == productAmount) {
                     // Invalid amount
                     JOptionPane.showMessageDialog(null,
-                            String.format("Set amount for %s", panel.get_product().get_name()),
+                            String.format("Set amount for %s", panel.getProduct().getName()),
                             "Error", JOptionPane.ERROR_MESSAGE);
                     return null;
                 }
 
-                for (int i = 0; i < product_amount; ++i) {
-                    order.add_product(panel.get_product());
+                for (int i = 0; i < productAmount; ++i) {
+                    order.addProduct(panel.getProduct());
                 }
             }
 
-            if (order.is_empty()) {
+            if (order.isEmpty()) {
                 // Empty order
                 JOptionPane.showMessageDialog(null,
                         "Please select some products", "Error", JOptionPane.ERROR_MESSAGE);
@@ -168,36 +199,60 @@ public class OrdersManager extends JFrame {
             return order;
         }
 
-        private DialogOption _show_summary_dialog(Order order) {
-
-            String summary = order.get_order_summary();
+        /**
+         * Show order summary to user,
+         * and let them choose what to do next
+         * order, change order, cancel order
+         * @param order the user order
+         * @return the option that the user selected
+         */
+        private DialogOption _showSummaryDialog(Order order) {
+            String summary = order.getOrderSummary();
 
             // Show summary dialog
-            int chosen_option = JOptionPane.showOptionDialog(null, summary,
+            int chosenOption = JOptionPane.showOptionDialog(null, summary,
                     "Order summary", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
                     null, DialogOption.values(), DialogOption.Change);
 
-            if (JOptionPane.CLOSED_OPTION == chosen_option) {
+            if (JOptionPane.CLOSED_OPTION == chosenOption) {
                 return DialogOption.Change;
             }
 
-            return DialogOption.values()[chosen_option];
+            return DialogOption.values()[chosenOption];
         }
 
-        private void _handle_confirm(Order order) throws IOException {
-            String file_name = JOptionPane.showInputDialog(null,
-                    "Enter name with ID (no space): ");
+        /**
+         * Write the user order to file
+         * named as the user input (name and ID)
+         * @param order user order
+         * @throws IOException if there is a file error the exception thrown
+         */
+        private void _handleConfirm(Order order) throws IOException {
+            String fileName = "";
+
+            do {
+                fileName = JOptionPane.showInputDialog(null,
+                        "Enter name with ID (no space): ");
+                if (null == fileName) {
+                    // The user canceled
+                    return;
+                }
+            } while(fileName.isEmpty());
 
             // Write order summary to client file
-            FileWriter writer = new FileWriter(file_name + ".txt");
-            writer.write(order.get_order_summary());
+            FileWriter writer = new FileWriter(fileName + ".txt");
+            writer.write(order.getOrderSummary());
             writer.close();
 
-            reset_panels();
+            resetPanels();
         }
 
-        private void _handle_cancel() {
-            reset_panels();
+        /**
+         * Cancel order, reset all products
+         * choices and products amount choices
+         */
+        private void _handleCancel() {
+            resetPanels();
         }
     }
 }

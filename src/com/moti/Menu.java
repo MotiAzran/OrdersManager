@@ -2,39 +2,49 @@ package com.moti;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.ListIterator;
 
+/**
+ * Represent a menu
+ */
 public class Menu {
-
     private ArrayList<Product> _products;
 
+    /**
+     * Initialize an empty menu
+     */
     Menu() {
         _products = new ArrayList<Product>();
     }
 
-    Menu(ArrayList<Product> products) {
-
-        for (Product product : products) {
-            _products.add(new Product(product));
-        }
-    }
-
-    public static Menu parse_menu_from_file(Scanner menu_file) {
+    /**
+     * Create menu from file
+     * @param menuFile input for the input
+     * @return the initialized menu
+     */
+    public static Menu parseMenuFromFile(Scanner menuFile) {
 
         Menu menu = new Menu();
 
-        while (menu_file.hasNext()) {
-            menu.add_product(Product.parse_product_from_file(menu_file));
+        while (menuFile.hasNext()) {
+            menu.addProduct(Product.parseProductFromFile(menuFile));
         }
 
         return menu;
     }
 
-    void add_product(Product product) {
+    /**
+     * Add product to menu
+     * @param product product to add
+     */
+    void addProduct(Product product) {
         _products.add(new Product(product));
     }
 
-    public ArrayList<Product> get_products() {
+    /**
+     * Get all menu products
+     * @return list of menu products
+     */
+    public ArrayList<Product> getProducts() {
         return _products;
     }
 }

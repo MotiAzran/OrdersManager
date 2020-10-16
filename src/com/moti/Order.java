@@ -1,41 +1,57 @@
 package com.moti;
 
 import java.util.ArrayList;
-import java.util.ListIterator;
 
+/**
+ * Represent a client order
+ */
 public class Order {
+    /*
+     * Holds list of all the products
+     * and updates a total price for all the products
+     */
 
     private ArrayList<Product> _products;
-    private float _total_price;
+    private float _totalPrice;
 
-    Order() {
+    /**
+     * Initialize the order without prodcts
+     */
+    public Order() {
         _products = new ArrayList<Product>();
     }
 
-    Order(ArrayList<Product> products)  {
-        for (Product product : products) {
-            _products.add(new Product(product));
-            _total_price += product.get_price();
-        }
-    }
-
-    void add_product(Product product)  {
+    /**
+     * Add product to the order
+     * @param product product to add
+     */
+    public void addProduct(Product product)  {
         _products.add(new Product(product));
-        _total_price += product.get_price();
+        _totalPrice += product.getPrice();
     }
 
-    public boolean is_empty() {
+    /**
+     * Checks if the order is empty
+     * @return true if the order has no products, otherwise false
+     */
+    public boolean isEmpty() {
         return _products.isEmpty();
     }
 
-    public String get_order_summary() {
+    /**
+     * Get summary of the order,
+     * string with all the order products
+     * and their prices
+     * @return order summary message
+     */
+    public String getOrderSummary() {
         String summary = "";
 
         for (Product p : _products) {
-            summary = summary.concat(String.format("%s %.2f\n", p.get_name(), p.get_price()));
+            summary = summary.concat(String.format("%s %.2f\n", p.getName(), p.getPrice()));
         }
 
-        summary = summary.concat(String.format("\nTotal price: %.2f", _total_price));
+        summary = summary.concat(String.format("\nTotal price: %.2f", _totalPrice));
 
         return summary;
     }
