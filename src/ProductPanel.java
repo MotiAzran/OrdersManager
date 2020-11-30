@@ -13,47 +13,45 @@ public class ProductPanel extends JPanel {
      *  - combo box to select amount to buy
      */
 
-    private final Integer[] AMOUNT_VALUES = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    public static final int PANEL_WIDTH = 500;
-    public static final int PANEL_HEIGHT = 50;
-    private JCheckBox _checkBox;
-    private boolean _isChosen;
-    private JComboBox<Integer> _amountComboBox;
-    private Product _product;
+    private final Integer[] AMOUNT_VALUES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    private JCheckBox checkBox;
+    private boolean isChosen;
+    private JComboBox<Integer> amountComboBox;
+    private Product product;
 
     /**
      * Initialize product panel
      * @param product product to put in the panel
      */
-    public ProductPanel(Product product) {
+    public ProductPanel(Product product, int panelWidth, int panelHeight) {
         // Set panel size
-        setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+        setPreferredSize(new Dimension(panelWidth, panelHeight));
 
         // Copy product
-        _product = new Product(product);
+        this.product = new Product(product);
 
         // Initialize check box
-        _checkBox = new JCheckBox(String.format("%s: %s", _product.getName(), _product.getDescription()));
-        _checkBox.addItemListener(new ItemListener() {
+        checkBox = new JCheckBox(String.format("%s: %s", this.product.getName(), this.product.getDescription()));
+        checkBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                _isChosen = (ItemEvent.SELECTED == e.getStateChange());
+                isChosen = (ItemEvent.SELECTED == e.getStateChange());
             }
         });
 
         // Initialize combo box
-        _amountComboBox = new JComboBox<>(AMOUNT_VALUES);
+        amountComboBox = new JComboBox<Integer>(AMOUNT_VALUES);
 
-        add(_checkBox);
-        add(_amountComboBox);
+        add(checkBox);
+        add(amountComboBox);
     }
 
     /**
      * Get if the user chose the product
      * @return true of the product chosen, otherwise false
      */
-    public boolean is_chosen() {
-        return _isChosen;
+    public boolean isChosen() {
+        return isChosen;
     }
 
     /**
@@ -61,12 +59,12 @@ public class ProductPanel extends JPanel {
      * @return the amount of products
      */
     public int getAmount() {
-        if (-1 == _amountComboBox.getSelectedIndex()) {
+        if (-1 == amountComboBox.getSelectedIndex()) {
             // The amount isn't set
             return -1;
         }
 
-        return _amountComboBox.getItemAt(_amountComboBox.getSelectedIndex());
+        return amountComboBox.getItemAt(amountComboBox.getSelectedIndex());
     }
 
     /**
@@ -74,15 +72,15 @@ public class ProductPanel extends JPanel {
      * @return Get the product from the panel
      */
     public Product getProduct() {
-        return _product;
+        return product;
     }
 
     /**
      * Reset panel, unset check box and zero the combo box
      */
     public void resetPanel() {
-        _checkBox.setSelected(false);
-        _amountComboBox.setSelectedIndex(0);
-        _isChosen = false;
+        checkBox.setSelected(false);
+        amountComboBox.setSelectedIndex(0);
+        isChosen = false;
     }
 }

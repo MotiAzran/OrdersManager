@@ -4,10 +4,10 @@ import java.util.Scanner;
  * Represent a product in the restaurant
  */
 public class Product {
-    private String _name;
-    private String _description;
-    private MealType _mealType;
-    private float _price;
+    private String name;
+    private String description;
+    private MealType mealType;
+    private float price;
 
     /**
      * Holds valid values to meal types
@@ -27,10 +27,10 @@ public class Product {
      * @param price product price
      */
     public Product(String name, String description, MealType meal_type, float price) {
-        _name = name;
-        _description = description;
-        _mealType = meal_type;
-        _price = price;
+        this.name = name;
+        this.description = description;
+        mealType = meal_type;
+        this.price = price;
     }
 
     /**
@@ -39,10 +39,10 @@ public class Product {
      * @param p product to copy
      */
     public Product(Product p) {
-        _name = p._name;
-        _description = p._description;
-        _mealType = p._mealType;
-        _price = p._price;
+        name = p.name;
+        description = p.description;
+        mealType = p.mealType;
+        price = p.price;
     }
 
     /**
@@ -59,12 +59,12 @@ public class Product {
     public static Product parseProductFromFile(Scanner productFile) throws IllegalArgumentException{
         // Parse first product line - get name and description
         String descriptionLine = productFile.nextLine();
-        String name = _getNameByLine(descriptionLine);
-        String description = _getDescriptionByLine(descriptionLine);
+        String name = getNameByLine(descriptionLine);
+        String description = getDescriptionByLine(descriptionLine);
 
         // Parse second product line - get meal type
         String mealTypeLine = productFile.nextLine();
-        MealType mealType = _getMealTypeByLine(mealTypeLine);
+        MealType mealType = getMealTypeByLine(mealTypeLine);
         if (null == mealType) {
             throw new IllegalArgumentException("Invalid meal type " + mealTypeLine);
         }
@@ -86,7 +86,7 @@ public class Product {
      * @return meal type in case the line represent a MealType name,
      *          otherwise null
      */
-    private static MealType _getMealTypeByLine(String line) {
+    private static MealType getMealTypeByLine(String line) {
         // Check if the type is a meal type
         for (Product.MealType type : Product.MealType.values()) {
             if (line.equalsIgnoreCase(type.name())) {
@@ -104,7 +104,7 @@ public class Product {
      * @param line the line with the name and description
      * @return product name
      */
-    private static String _getNameByLine(String line) {
+    private static String getNameByLine(String line) {
 
         // line format: <name>,<description>
         return line.split(",")[0];
@@ -117,7 +117,7 @@ public class Product {
      * @return product description if appears, if there isn't a comma
      *          returned an empty string
      */
-    private static String _getDescriptionByLine(String line) {
+    private static String getDescriptionByLine(String line) {
 
         if (line.indexOf(',') == -1 || line.indexOf(',') == (line.length() - 1)) {
             // The comma is last character or it does not appearing in the line
@@ -132,7 +132,7 @@ public class Product {
      * @return product name
      */
     public String getName() {
-        return _name;
+        return name;
     }
 
     /**
@@ -140,7 +140,7 @@ public class Product {
      * @return product description
      */
     public String getDescription() {
-        return _description;
+        return description;
     }
 
     /**
@@ -148,7 +148,7 @@ public class Product {
      * @return meal type of the product
      */
     public String getMealType() {
-        return _mealType.name();
+        return mealType.name();
     }
 
     /**
@@ -156,6 +156,6 @@ public class Product {
      * @return product price
      */
     public float getPrice() {
-        return _price;
+        return price;
     }
 }

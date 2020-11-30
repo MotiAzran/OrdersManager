@@ -9,14 +9,14 @@ public class Order {
      * and updates a total price for all the products
      */
 
-    private ArrayList<Product> _products;
-    private float _totalPrice;
+    private ArrayList<Product> products;
+    private float totalPrice;
 
     /**
      * Initialize the order without prodcts
      */
     public Order() {
-        _products = new ArrayList<Product>();
+        products = new ArrayList<Product>();
     }
 
     /**
@@ -24,8 +24,8 @@ public class Order {
      * @param product product to add
      */
     public void addProduct(Product product)  {
-        _products.add(new Product(product));
-        _totalPrice += product.getPrice();
+        products.add(new Product(product));
+        totalPrice += product.getPrice();
     }
 
     /**
@@ -33,7 +33,7 @@ public class Order {
      * @return true if the order has no products, otherwise false
      */
     public boolean isEmpty() {
-        return _products.isEmpty();
+        return products.isEmpty();
     }
 
     /**
@@ -45,11 +45,11 @@ public class Order {
     public String getOrderSummary() {
         String summary = "";
 
-        for (Product p : _products) {
+        for (Product p : products) {
             summary = summary.concat(String.format("%s %.2f\n", p.getName(), p.getPrice()));
         }
 
-        summary = summary.concat(String.format("\nTotal price: %.2f", _totalPrice));
+        summary = summary.concat(String.format("\nTotal price: %.2f", totalPrice));
 
         return summary;
     }

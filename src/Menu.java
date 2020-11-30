@@ -5,13 +5,13 @@ import java.util.Scanner;
  * Represent a menu
  */
 public class Menu {
-    private ArrayList<Product> _products;
+    private ArrayList<Product> products;
 
     /**
      * Initialize an empty menu
      */
     Menu() {
-        _products = new ArrayList<Product>();
+        products = new ArrayList<Product>();
     }
 
     /**
@@ -35,7 +35,7 @@ public class Menu {
      * @param product product to add
      */
     void addProduct(Product product) {
-        _products.add(new Product(product));
+        products.add(new Product(product));
     }
 
     /**
@@ -43,6 +43,6 @@ public class Menu {
      * @return list of menu products
      */
     public ArrayList<Product> getProducts() {
-        return _products;
+        return products;
     }
 }

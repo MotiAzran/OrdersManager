@@ -5,8 +5,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -21,12 +19,14 @@ public class OrdersManager extends JFrame {
 
     private final int BUTTONS_PANEL_WIDTH = 500;
     private final int BUTTONS_PANEL_HEIGHT = 50;
-    private Menu _menu;
-    private JPanel _menuPanel;
-    private JScrollPane _productsScrollPane;
-    private ArrayList<ProductPanel> _productPanels;
-    private JPanel _buttonsPanel;
-    private JButton _orderButton;
+    private final int PRODUCT_PANEL_WIDTH = 500;
+    private final int PRODUCT_PANEL_HEIGHT = 50;
+    private Menu menu;
+    private JPanel menuPanel;
+    private JScrollPane productsScrollPane;
+    private ArrayList<ProductPanel> productPanels;
+    private JPanel buttonsPanel;
+    private JButton orderButton;
 
     /**
      * Holds all options after pressing order
@@ -43,17 +43,17 @@ public class OrdersManager extends JFrame {
      * @throws FileNotFoundException if the menu file doesn't exists the exception thrown
      */
     public OrdersManager(String menuFilePath) throws FileNotFoundException {
-        super("Orders manager");
+        super("Orders Manager");
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-        _initButtonsPanel();
+        initButtonsPanel();
 
-        _menu = Menu.parseMenuFromFile(new Scanner(new File(menuFilePath)));
+        menu = Menu.parseMenuFromFile(new Scanner(new File(menuFilePath)));
 
-        _initProductsPanel();
+        initProductsPanel();
 
-        int frameWidth = Math.max(BUTTONS_PANEL_WIDTH, ProductPanel.PANEL_WIDTH);
-        int frameHeight = Math.min(BUTTONS_PANEL_HEIGHT + ProductPanel.PANEL_HEIGHT * _productPanels.size(), 600);
+        int frameWidth = Math.max(BUTTONS_PANEL_WIDTH, PRODUCT_PANEL_WIDTH);
+        int frameHeight = Math.min(BUTTONS_PANEL_HEIGHT + PRODUCT_PANEL_HEIGHT * productPanels.size(), 600);
 
         setSize(frameWidth, frameHeight);
     }
@@ -61,55 +61,52 @@ public class OrdersManager extends JFrame {
     /**
      * Init the buttons of the program
      */
-    private void _initButtonsPanel() {
+    private void initButtonsPanel() {
 
         // Create panel for all buttons
-        _buttonsPanel = new JPanel();
-        _buttonsPanel.setPreferredSize(new Dimension(BUTTONS_PANEL_WIDTH, BUTTONS_PANEL_HEIGHT));
+        buttonsPanel = new JPanel();
+        buttonsPanel.setPreferredSize(new Dimension(BUTTONS_PANEL_WIDTH, BUTTONS_PANEL_HEIGHT));
 
         // Create order button
-        _orderButton = new JButton("Order");
-        _orderButton.addActionListener(new OrderButtonListener());
+        orderButton = new JButton("Order");
+        orderButton.addActionListener(new OrderButtonListener());
 
-        _buttonsPanel.add(_orderButton);
-
+        buttonsPanel.add(orderButton);
     }
 
     /**
      * Initialize the check box and the combo box
      */
-    private void _initProductsPanel()  {
+    private void initProductsPanel()  {
         // Create panel for all product panels
-        _menuPanel = new JPanel();
-        _menuPanel.setLayout(new BoxLayout(_menuPanel, BoxLayout.Y_AXIS));
+        menuPanel = new JPanel();
+        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
 
-        ArrayList<Product> products = _menu.getProducts();
-        _productPanels = new ArrayList<>();
+        ArrayList<Product> products = menu.getProducts();
+        productPanels = new ArrayList<>();
         for (Product.MealType mealType : Product.MealType.values()) {
-            // Get all products of the current meal type
-            List<Product> currentProducts = products.stream().filter(
-                    p -> p.getMealType().equalsIgnoreCase(mealType.name())).collect(Collectors.toList());
-
             // Add meal type label
             JPanel mealTypePanel = new JPanel();
             JLabel mealTypeLabel = new JLabel(mealType.name());
             mealTypePanel.add(mealTypeLabel);
 
-            _menuPanel.add(mealTypePanel);
+            menuPanel.add(mealTypePanel);
 
             // Add all product of the current meal type
-            for (Product p : currentProducts) {
-                ProductPanel panel = new ProductPanel(p);
-                _productPanels.add(panel);
+            for (Product p : products) {
+                if (p.getMealType().equalsIgnoreCase(mealType.name())) {
+                    ProductPanel panel = new ProductPanel(p, PRODUCT_PANEL_WIDTH, PRODUCT_PANEL_HEIGHT);
+                    productPanels.add(panel);
 
-                _menuPanel.add(panel);
+                    menuPanel.add(panel);
+                }
             }
         }
 
-        _productsScrollPane = new JScrollPane(_menuPanel);
+        productsScrollPane = new JScrollPane(menuPanel);
 
-        getContentPane().add(_productsScrollPane);
-        add(_buttonsPanel);
+        getContentPane().add(productsScrollPane);
+        add(buttonsPanel);
     }
 
     /**
@@ -117,7 +114,7 @@ public class OrdersManager extends JFrame {
      */
     private void resetPanels() {
         // Reset all product panels
-        for (ProductPanel panel : _productPanels) {
+        for (ProductPanel panel : productPanels) {
             panel.resetPanel();
         }
     }
@@ -135,16 +132,16 @@ public class OrdersManager extends JFrame {
         public void actionPerformed(ActionEvent e) {
 
             // Init order by user selection
-            Order order = _initOrder();
+            Order order = initOrder();
             if (null == order) {
                 return;
             }
 
-            DialogOption chosenOption = _showSummaryDialog(order);
+            DialogOption chosenOption = showSummaryDialog(order);
             switch (chosenOption) {
                 case Confirm:
                     try {
-                        _handleConfirm(order);
+                        handleConfirm(order);
                     } catch (IOException exp) {
                         JOptionPane.showMessageDialog(null, "IO Error",
                                 "Error", JOptionPane.ERROR_MESSAGE);
@@ -153,7 +150,7 @@ public class OrdersManager extends JFrame {
                 case Change:
                     break;
                 case Cancel:
-                    _handleCancel();
+                    handleCancel();
                     break;
                 default:
                     JOptionPane.showMessageDialog(null, "Invalid option",
@@ -165,12 +162,12 @@ public class OrdersManager extends JFrame {
          * Initialize user order
          * @return user chosen order
          */
-        private Order _initOrder() {
+        private Order initOrder() {
             Order order = new Order();
 
             // Add all chosen products to order
-            for (ProductPanel panel : _productPanels) {
-                if (!panel.is_chosen()) {
+            for (ProductPanel panel : productPanels) {
+                if (!panel.isChosen()) {
                     continue;
                 }
 
@@ -205,7 +202,7 @@ public class OrdersManager extends JFrame {
          * @param order the user order
          * @return the option that the user selected
          */
-        private DialogOption _showSummaryDialog(Order order) {
+        private DialogOption showSummaryDialog(Order order) {
             String summary = order.getOrderSummary();
 
             // Show summary dialog
@@ -226,7 +223,7 @@ public class OrdersManager extends JFrame {
          * @param order user order
          * @throws IOException if there is a file error the exception thrown
          */
-        private void _handleConfirm(Order order) throws IOException {
+        private void handleConfirm(Order order) throws IOException {
             String fileName = "";
 
             do {
@@ -250,7 +247,7 @@ public class OrdersManager extends JFrame {
          * Cancel order, reset all products
          * choices and products amount choices
          */
-        private void _handleCancel() {
+        private void handleCancel() {
             resetPanels();
         }
     }
